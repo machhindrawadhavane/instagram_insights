@@ -19,6 +19,11 @@ $app_token = 'EAAPaZAooZAXFYBAMgjr4WKiywi51l985lH3fb9WZCKdZCo4y8ZAZB4h3bkRPyye3X
 $pageId = '1954072204870360';
 $pageName = "NEWJ";
 $instagramBusinessAccountId = '17841407454307610';
+$query = "select * from ig_statuses where page_id = '".$pageId."' ";
+$result = mysqli_query($conn,$query);
+$pageInsightsStatusData = mysqli_fetch_object($result);
+$since = $pageInsightsStatusData->start_date;
+$until = $pageInsightsStatusData->end_date;
 function checkTokenValidity($token)
 {
     global $fb;
@@ -28,7 +33,7 @@ function checkTokenValidity($token)
 }
 
 checkTokenValidity($app_token);
-updateInstagramStatusesData($app_token);
+postInstagramUserDaysInsightsDataByAccountID($app_token);
 
 function saveUpdateInstagramMediaIdFromBusinessAccountId($token)
 {
@@ -49,8 +54,8 @@ function saveUpdateInstagramMediaIdFromBusinessAccountId($token)
 
 function postInstagramUserDaysInsightsDataByAccountID($token)
 {
-    global $conn,$fb,$pageId,$instagramBusinessAccountId,$pageName;
-	$url = $instagramBusinessAccountId.'/insights?metric=impressions,reach,profile_views,email_contacts,follower_count,get_directions_clicks,phone_call_clicks,text_message_clicks,website_clicks&period=day';
+    global $conn,$fb,$pageId,$instagramBusinessAccountId,$pageName,$since,$until;
+	$url = $instagramBusinessAccountId.'/insights?metric=impressions,reach,profile_views,email_contacts,follower_count,get_directions_clicks,phone_call_clicks,text_message_clicks,website_clicks&period=day&since='.$since.'&until='.$until.' ';
 	try {
 			$resp = $fb->get($url,$token);
 		} catch (Facebook\Exceptions\FacebookResponseException $e) {
@@ -62,26 +67,55 @@ function postInstagramUserDaysInsightsDataByAccountID($token)
 		}
 		$pagesEdge = $resp->getGraphEdge();
 		do {
+			$monthCounter = 0;
+			$innerPostDataArr = array();
 			foreach($pagesEdge as $userInsights){
+				$updateQueryCoulumnValues = "period='day' ";
 				if(isset($userInsights['values']) && count($userInsights['values']) > 0){
-					foreach($userInsights['values'] as $dateWiseData){
+					foreach($userInsights['values'] as $key => $dateWiseData){
 						$dt = new DateTime();
 						$date_object = $dateWiseData['end_time'];
 						$insightDate = $date_object->format('Y-m-d');	
 						$metricName = isset($userInsights['name']) ? mysqli_real_escape_string($conn,$userInsights['name']) : "";
-						$query = "select * from ig_users_post_insights_data_daywise where ig_business_account_id = '".$instagramBusinessAccountId."' and metric_name = '".$metricName."' and date = '".$insightDate."' ";
-						$result = mysqli_query($conn, $query);
-						$rowcount=mysqli_num_rows($result);
-						if($rowcount > 0){
-							 $sql = "UPDATE ig_users_post_insights_data_daywise SET value ='".$dateWiseData['value']."' WHERE ig_business_account_id = '".$instagramBusinessAccountId."' and metric_name = '".$metricName."' and date = '".$insightDate."' ";
-						}else{
-								$sql = "INSERT INTO `ig_users_post_insights_data_daywise` (page_id,ig_business_account_id,page_name,metric_name,period,value,date) VALUES ('".$pageId."','".$instagramBusinessAccountId."','".$pageName."','".$metricName."','".$userInsights['period']."','".$dateWiseData['value']."','".$insightDate."') ";
-						}
-						$conn->query($sql);
+						$value = isset($dateWiseData['value']) ? $dateWiseData['value'] : 0;
+						$innerPostDataArr[$insightDate][$metricName]['value'] = $value;
+						$innerPostDataArr[$insightDate]['ig_business_account_id']['value'] = $instagramBusinessAccountId;
+						$innerPostDataArr[$insightDate]['page_id']['value'] = $pageId;
+						$innerPostDataArr[$insightDate]['page_name']['value'] = $pageName;
+						$innerPostDataArr[$insightDate]['period']['value'] = $userInsights['period'];
 					}
 				}
+				$monthCounter++;
 			}
+			insertUpdateMediaInsighs($innerPostDataArr);
 		} while ($pagesEdge = $fb->next($pagesEdge));
+}
+
+function insertUpdateMediaInsighs($igMediaInsightsData=array()){
+	 global $conn,$fb,$pageId,$instagramBusinessAccountId,$pageName;
+	foreach($igMediaInsightsData as $insightsDate => $fieldsData){
+		$insertQueryColumns = '`date`';
+		$vls = "'".$insightsDate."' ";
+		$updateQueryCoulumnValues = "date='".$insightsDate."'";
+		foreach($fieldsData as $columnName=>$innerData){
+			$insertQueryColumns.=',`'.$columnName.'`';
+			$value = isset($innerData['value']) ? $innerData['value'] : 0;
+			$updateQueryCoulumnValues.=",".$columnName."='".$value."' ";
+			$vls .= ",'".$value."' ";
+		}
+		$query = "select * from ig_users_post_insights_data_daywise where ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' and date = '".$insightsDate."' ";
+		$result = mysqli_query($conn, $query);
+		$rowcount=mysqli_num_rows($result);
+		if($rowcount > 0){
+			$sql = "UPDATE ig_users_post_insights_data_daywise SET $updateQueryCoulumnValues WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' and date = '".$insightsDate."' ";
+		}else{
+			$sql = "INSERT INTO ig_users_post_insights_data_daywise (".$insertQueryColumns.") VALUES (".$vls.") ";
+		}
+		$updateStatusQuery = "UPDATE ig_statuses SET start_date='".$insightsDate."' WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' ";
+		echo $updateStatusQuery."\n";
+		$conn->query($updateStatusQuery);
+		$conn->query($sql);
+	}
 }
 
 function updateInstagramStatusesData($token)
@@ -106,7 +140,7 @@ function updateInstagramStatusesData($token)
 				$rowcount=mysqli_num_rows($result);
 				$igBusinessAccountID = getInstagramBusinessAccountIdByPageId($token,$bAccounts['id']);
 				if($rowcount > 0){
-				  echo $sql = "UPDATE ig_statuses SET access_token='".$bAccounts['access_token']."',ig_business_account_id='".$igBusinessAccountID."' WHERE page_id = '".$bAccounts['id']."' ";
+				  $sql = "UPDATE ig_statuses SET access_token='".$bAccounts['access_token']."',ig_business_account_id='".$igBusinessAccountID."' WHERE page_id = '".$bAccounts['id']."' ";
 				}else{
 				   $sql = "INSERT INTO `ig_statuses` (access_token,page_id,ig_business_account_id,page_name) VALUES ('".$bAccounts['access_token']."','".$bAccounts['id']."','".$igBusinessAccountID."','".$bAccounts['name']."') ";
 				}

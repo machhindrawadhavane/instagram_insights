@@ -14,7 +14,7 @@ $fb = new \Facebook\Facebook([
     'default_graph_version' => 'v6.0',
     //'default_access_token' => '{access-token}', // optional
 ]);
-$isSaveUpdateMediaPostInsights = true;
+$isSaveUpdateMediaPostInsights = false;
 $isSaveUpdateMediaIds = false;
 $app_token = 'EAAPaZAooZAXFYBAMgjr4WKiywi51l985lH3fb9WZCKdZCo4y8ZAZB4h3bkRPyye3X99va98BXP3NpR7MLkbZCwzMZAZBacWrgCL1lQBBY4GEHz2vPJuZAS3DWTWG68sn3e2XydlAPVTXzQNktpjrcd7bJv5eitwTnBkIvN81RpmUIOigZDZD';
 $pageId = '1954072204870360';
@@ -112,3 +112,4 @@ function postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData = array(),$t
 
 $conn->close();
 die;
+

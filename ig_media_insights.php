@@ -89,12 +89,22 @@ function postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData = array(),$t
 			//print_r($pagesEdge->asArray());die;
 			$vls = "'".$mediaData['page_id']."','".$mediaData['ig_business_account_id']."','".$mediaData['page_name']."','".$mediaData['ig_media_id']."','lifetime'";
 			$insertQueryColumns = '`page_id`,`ig_business_account_id`,`page_name`,`ig_media_id`,`period`';
+			$updateQueryCoulumnValues = "page_id='".$mediaData['page_id']."',ig_business_account_id='".$mediaData['ig_business_account_id']."',page_name='".$mediaData['page_name']."',ig_media_id='".$mediaData['ig_media_id']."',period='lifetime' ";
 			foreach($pagesEdge as $userInsights){
 				$insertQueryColumns.= ',`'.$userInsights['name'].'`';
 				$value = isset($userInsights['values'][0]['value']) ? $userInsights['values'][0]['value'] : 0;
+				$updateQueryCoulumnValues.= ",".$userInsights['name']."='".$value."' ";
 				$vls .= ",'".$value."' ";
 			}
-			$sql = "INSERT INTO ig_post_media_insights (".$insertQueryColumns.") VALUES (".$vls.") ";
+			$query = "select * from ig_post_media_insights where ig_media_id = '".$mediaData['ig_media_id']."' ";
+			$result = mysqli_query($conn, $query);
+			$rowcount=mysqli_num_rows($result);
+			if($rowcount > 0){
+				$sql = "UPDATE ig_post_media_insights SET $updateQueryCoulumnValues WHERE ig_media_id = '".$mediaData['ig_media_id']."' ";
+			}else{
+				$sql = "INSERT INTO ig_post_media_insights (".$insertQueryColumns.") VALUES (".$vls.") ";
+			}
+			echo $sql.'</br>';
 			$conn->query($sql);
 		} while ($pagesEdge = $fb->next($pagesEdge));
 		echo "media insights uploaded successfully";

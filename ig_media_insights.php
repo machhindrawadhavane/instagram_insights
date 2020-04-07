@@ -34,7 +34,7 @@ if($isSaveUpdateMediaIds == true){
 }
 
 if($isSaveUpdateMediaPostInsights == true){
-	$query = "select * from ig_media_ids where page_name = '".$pageName."' and  id > 870 ";
+	$query = "select * from ig_media_ids where page_name = '".$pageName."' ";
 	$result = mysqli_query($conn, $query);
 	while ($mediaData = mysqli_fetch_assoc($result)) {
 		postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData,$app_token);

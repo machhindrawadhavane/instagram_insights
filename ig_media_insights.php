@@ -14,7 +14,7 @@ $fb = new \Facebook\Facebook([
     'default_graph_version' => 'v6.0',
     //'default_access_token' => '{access-token}', // optional
 ]);
-$isSaveUpdateMediaPostInsights = false;
+$isSaveUpdateMediaPostInsights = true;
 $isSaveUpdateMediaIds = false;
 $app_token = 'EAAPaZAooZAXFYBAMgjr4WKiywi51l985lH3fb9WZCKdZCo4y8ZAZB4h3bkRPyye3X99va98BXP3NpR7MLkbZCwzMZAZBacWrgCL1lQBBY4GEHz2vPJuZAS3DWTWG68sn3e2XydlAPVTXzQNktpjrcd7bJv5eitwTnBkIvN81RpmUIOigZDZD';
 $pageId = '1954072204870360';
@@ -34,7 +34,7 @@ if($isSaveUpdateMediaIds == true){
 }
 
 if($isSaveUpdateMediaPostInsights == true){
-	$query = "select * from ig_media_ids where page_name = '".$pageName."' ";
+	$query = "select * from ig_media_ids where page_name = '".$pageName."' and  id > 870 ";
 	$result = mysqli_query($conn, $query);
 	while ($mediaData = mysqli_fetch_assoc($result)) {
 		postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData,$app_token);
@@ -67,14 +67,40 @@ function saveUpdateInstagramMediaIdFromBusinessAccountId($token)
 				   $sql = "INSERT INTO `ig_media_ids` (page_id,ig_business_account_id,page_name,ig_media_id) VALUES ('".$pageId."','".$instagramBusinessAccountId."','".$pageName."','".$mediaData['id']."') ";
 				}
 				$conn->query($sql);
+				postInstagramMediaMetaDataByMediaId($mediaData,$token);
 			}
 		} while ($pagesEdge = $fb->next($pagesEdge));
+}
+
+function postInstagramMediaMetaDataByMediaId($mediaData = array(),$token)
+{
+    global $conn,$fb,$pageId,$instagramBusinessAccountId,$pageName;
+	$url = $mediaData['id'].'?fields=caption,children,comments_count,ig_id,media_type,media_url,owner,permalink,shortcode,timestamp,like_count';
+	try {
+			$resp = $fb->get($url,$token);
+		} catch (Facebook\Exceptions\FacebookResponseException $e) {
+			echo 'Graph returned an error: ' . $e->getMessage();
+			exit;
+		} catch (Facebook\Exceptions\FacebookSDKException $e) {
+			echo 'Facebook SDK returned an error: ' . $e->getMessage();
+			exit;
+		}
+		$pagesEdge = $resp->getGraphNode();
+		$updateQueryCoulumnValues = "caption='".$pagesEdge['caption']."',media_type='".$pagesEdge['media_type']."',permalink='".$pagesEdge['permalink']."',media_url='".$pagesEdge['media_url']."',shortcode='".$pagesEdge['shortcode']."',timestamp='".$pagesEdge['timestamp']."',like_count='".$pagesEdge['like_count']."',comments_count='".$pagesEdge['comments_count']."' ";
+		$sql = "UPDATE ig_media_ids SET $updateQueryCoulumnValues WHERE ig_media_id = '".$mediaData['id']."' ";
+		echo $mediaData['id'].'</br>';
+		$conn->query($sql);
 }
 
 function postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData = array(),$token)
 {
     global $conn,$fb,$pageId,$instagramBusinessAccountId,$pageName;
-	$url = $mediaData['ig_media_id'].'/insights?metric=engagement,impressions,reach,saved,video_views&period=lifetime';
+	if(isset($mediaData['media_type']) && $mediaData['media_type'] == "VIDEO"){
+		$url = $mediaData['ig_media_id'].'/insights?metric=engagement,impressions,reach,saved,video_views&period=lifetime';
+	}else{
+		$url = $mediaData['ig_media_id'].'/insights?metric=engagement,impressions,reach,saved&period=lifetime';
+	}
+	
 	try {
 			$resp = $fb->get($url,$token);
 		} catch (Facebook\Exceptions\FacebookResponseException $e) {
@@ -104,12 +130,12 @@ function postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData = array(),$t
 			}else{
 				$sql = "INSERT INTO ig_post_media_insights (".$insertQueryColumns.") VALUES (".$vls.") ";
 			}
-			echo $sql.'</br>';
+			echo $mediaData['ig_media_id'].'<\n>';
 			$conn->query($sql);
 		} while ($pagesEdge = $fb->next($pagesEdge));
-		echo "media insights uploaded successfully";
 }
 
 $conn->close();
+echo "data updated successfully";
 die;
 

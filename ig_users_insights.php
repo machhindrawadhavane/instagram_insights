@@ -24,6 +24,7 @@ $result = mysqli_query($conn,$query);
 $pageInsightsStatusData = mysqli_fetch_object($result);
 $since = $pageInsightsStatusData->start_date;
 $until = $pageInsightsStatusData->end_date;
+
 function checkTokenValidity($token)
 {
     global $fb;

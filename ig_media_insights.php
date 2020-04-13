@@ -9,14 +9,14 @@ require "db_config.php";
 $link = new Database(DB_SERVER, DB_USER, DB_PASS, DB_DATABASE);
 $conn = $link->connect();
 $fb = new \Facebook\Facebook([
-    'app_id' => '1084558868569174',
-    'app_secret' => '3102f6ed34215835cb029b5fce29325c',
+    'app_id' => '2017323495200996',
+    'app_secret' => 'acfeadb315700871e3c39ae4d731c2c5',
     'default_graph_version' => 'v6.0',
     //'default_access_token' => '{access-token}', // optional
 ]);
 $isSaveUpdateMediaPostInsights = true;
 $isSaveUpdateMediaIds = false;
-$app_token = 'EAAPaZAooZAXFYBAMgjr4WKiywi51l985lH3fb9WZCKdZCo4y8ZAZB4h3bkRPyye3X99va98BXP3NpR7MLkbZCwzMZAZBacWrgCL1lQBBY4GEHz2vPJuZAS3DWTWG68sn3e2XydlAPVTXzQNktpjrcd7bJv5eitwTnBkIvN81RpmUIOigZDZD';
+$app_token = 'EAAcqvrpUGOQBALupNk6eEIiT7Fq9ZB1tpLt2zhVdwyZAN49IKzes35BobVMCZCwOwi2QWKMKfTH2ysKui8ZBoE51qaPVWGDLzuRbZCqmGb7hgP5C6v03J0ai9u1ZBm49GOxN2syviZBkIM8xc6Tt21WMKklJKWIkd4ExBc31kZCLRy7IcrD937YMWp0m2N3gjN5Qevycs07fuQZDZD';
 $pageId = '1954072204870360';
 $pageName = "NEWJ";
 $instagramBusinessAccountId = '17841407454307610';

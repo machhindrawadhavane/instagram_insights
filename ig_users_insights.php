@@ -67,6 +67,7 @@ function postInstagramUserDaysInsightsDataByAccountID($token)
 			exit;
 		}
 		$pagesEdge = $resp->getGraphEdge();
+		print_r($pagesEdge);die;
 		do {
 			$monthCounter = 0;
 			$innerPostDataArr = array();

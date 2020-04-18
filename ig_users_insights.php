@@ -15,15 +15,43 @@ $fb = new \Facebook\Facebook([
     //'default_access_token' => '{access-token}', // optional
 ]);
 
-$app_token = 'EAAcqvrpUGOQBALupNk6eEIiT7Fq9ZB1tpLt2zhVdwyZAN49IKzes35BobVMCZCwOwi2QWKMKfTH2ysKui8ZBoE51qaPVWGDLzuRbZCqmGb7hgP5C6v03J0ai9u1ZBm49GOxN2syviZBkIM8xc6Tt21WMKklJKWIkd4ExBc31kZCLRy7IcrD937YMWp0m2N3gjN5Qevycs07fuQZDZD';
+$app_token = 'EAAcqvrpUGOQBAMU1oZAGZAPbXIeBBuAFZAMHNUDeNYdjAiCnYvlUkAp7VJI5yy4h7VnlpleL0GXrObMCbURdVSd0FvHX0zNLpdZBYX4vwSOw4Emoh3ZCYyTMyTe2VYmGPKZBdZAjPbquB9YedBwqAkvi5lyF9euM82IHMy2FbZBheAZDZD';
 $pageId = '1954072204870360';
 $pageName = "NEWJ";
+
+function generateDates($start, $end)
+{
+  $result = [];
+  while ($start <= $end) {
+    $result[$start->format('Y')][$start->format('m')][] = $start->format('d');
+    $start->add(new DateInterval('P1D'));
+  }
+  $monthsArray  = array();
+  foreach($result as $year => $yearlyData){
+	  foreach($yearlyData as $monthName => $mothData){
+		  $count = count($mothData);
+		  $monthsArray[$year][$monthName]['start_date'] = $year.'-'.$monthName.'-'.$mothData[0];
+		  $monthsArray[$year][$monthName]['end_date'] = $year.'-'.$monthName.'-'.$mothData[$count-1];
+	  }
+  }
+  return $monthsArray;
+}
+
+$start = new DateTime('2019-01-1');
+$end = new DateTime('2019-12-30');
+
+$yearlyMonthData = generateDates($start, $end);
 $instagramBusinessAccountId = '17841407454307610';
-$query = "select * from ig_statuses where page_id = '".$pageId."' ";
+$query = "select * from ig_statuses where id = 2 ";
 $result = mysqli_query($conn,$query);
 $pageInsightsStatusData = mysqli_fetch_object($result);
+$pageId = $pageInsightsStatusData->page_id;
+$pageName = $pageInsightsStatusData->page_name;
+$instagramBusinessAccountId = $pageInsightsStatusData->ig_business_account_id;
 $since = $pageInsightsStatusData->start_date;
 $until = $pageInsightsStatusData->end_date;
+
+$isUpdateIGStatuses = false;
 
 function checkTokenValidity($token)
 {
@@ -34,7 +62,18 @@ function checkTokenValidity($token)
 }
 
 checkTokenValidity($app_token);
-postInstagramUserDaysInsightsDataByAccountID($app_token);
+foreach($yearlyMonthData as $yearlyData){
+	foreach($yearlyData as $monthData){
+		$since = $monthData['start_date'];
+		$until = $monthData['end_date'];	
+		postInstagramUserDaysInsightsDataByAccountID($app_token);
+		die;
+	}
+}
+
+if($isUpdateIGStatuses == true){
+	updateInstagramStatusesData($app_token);
+}
 
 function saveUpdateInstagramMediaIdFromBusinessAccountId($token)
 {
@@ -171,6 +210,9 @@ function getInstagramBusinessAccountIdByPageId($token,$pageId)
 		}
 		return 0;
 }
+
+
+
 
 $conn->close();
 die;

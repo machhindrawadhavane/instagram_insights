@@ -16,7 +16,7 @@ $fb = new \Facebook\Facebook([
 ]);
 $isSaveUpdateMediaPostInsights = true;
 $isSaveUpdateMediaIds = false;
-$app_token = 'EAAcqvrpUGOQBALupNk6eEIiT7Fq9ZB1tpLt2zhVdwyZAN49IKzes35BobVMCZCwOwi2QWKMKfTH2ysKui8ZBoE51qaPVWGDLzuRbZCqmGb7hgP5C6v03J0ai9u1ZBm49GOxN2syviZBkIM8xc6Tt21WMKklJKWIkd4ExBc31kZCLRy7IcrD937YMWp0m2N3gjN5Qevycs07fuQZDZD';
+$app_token = 'EAAcqvrpUGOQBAMU1oZAGZAPbXIeBBuAFZAMHNUDeNYdjAiCnYvlUkAp7VJI5yy4h7VnlpleL0GXrObMCbURdVSd0FvHX0zNLpdZBYX4vwSOw4Emoh3ZCYyTMyTe2VYmGPKZBdZAjPbquB9YedBwqAkvi5lyF9euM82IHMy2FbZBheAZDZD';
 $pageId = '100589847991303';
 $pageName = "English NEWJ";
 $instagramBusinessAccountId = '17841419587757276';

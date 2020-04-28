@@ -37,8 +37,8 @@ function generateDates($start, $end)
   return $monthsArray;
 }
 
-$start = new DateTime('2019-01-1');
-$end = new DateTime('2019-12-30');
+$start = new DateTime('2020-04-14');
+$end = new DateTime('2020-04-27');
 
 $yearlyMonthData = generateDates($start, $end);
 $instagramBusinessAccountId = '17841407454307610';
@@ -135,24 +135,24 @@ function postInstagramUserDaysInsightsDataByAccountID($token)
 function insertUpdateMediaInsighs($igMediaInsightsData=array()){
 	 global $conn,$fb,$pageId,$instagramBusinessAccountId,$pageName;
 	foreach($igMediaInsightsData as $insightsDate => $fieldsData){
-		$insertQueryColumns = '`date`';
+		$insertQueryColumns = '`dated`';
 		$vls = "'".$insightsDate."' ";
-		$updateQueryCoulumnValues = "date='".$insightsDate."'";
+		$updateQueryCoulumnValues = "dated='".$insightsDate."'";
 		foreach($fieldsData as $columnName=>$innerData){
 			$insertQueryColumns.=',`'.$columnName.'`';
 			$value = isset($innerData['value']) ? $innerData['value'] : 0;
 			$updateQueryCoulumnValues.=",".$columnName."='".$value."' ";
 			$vls .= ",'".$value."' ";
 		}
-		$query = "select * from ig_users_post_insights_data_daywise where ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' and date = '".$insightsDate."' ";
+		$query = "select * from ig_users_post_insights_data_daywise where ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' and dated = '".$insightsDate."' ";
 		$result = mysqli_query($conn, $query);
 		$rowcount=mysqli_num_rows($result);
 		if($rowcount > 0){
-			$sql = "UPDATE ig_users_post_insights_data_daywise SET $updateQueryCoulumnValues WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' and date = '".$insightsDate."' ";
+			$sql = "UPDATE ig_users_post_insights_data_daywise SET $updateQueryCoulumnValues WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' and dated = '".$insightsDate."' ";
 		}else{
 			$sql = "INSERT INTO ig_users_post_insights_data_daywise (".$insertQueryColumns.") VALUES (".$vls.") ";
 		}
-		$updateStatusQuery = "UPDATE ig_statuses SET start_date='".$insightsDate."' WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' ";
+		$updateStatusQuery = "UPDATE ig_statuses SET start_date='".$insightsDate."',end_date='".$insightsDate."' WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' ";
 		echo $updateStatusQuery."\n";
 		$conn->query($updateStatusQuery);
 		$conn->query($sql);

@@ -14,8 +14,8 @@ $fb = new \Facebook\Facebook([
     'default_graph_version' => 'v6.0',
     //'default_access_token' => '{access-token}', // optional
 ]);
-$isSaveUpdateMediaPostInsights = false;
-$isSaveUpdateMediaIds = true;
+$isSaveUpdateMediaPostInsights = true;
+$isSaveUpdateMediaIds = false;
 $app_token = 'EAAcqvrpUGOQBAMU1oZAGZAPbXIeBBuAFZAMHNUDeNYdjAiCnYvlUkAp7VJI5yy4h7VnlpleL0GXrObMCbURdVSd0FvHX0zNLpdZBYX4vwSOw4Emoh3ZCYyTMyTe2VYmGPKZBdZAjPbquB9YedBwqAkvi5lyF9euM82IHMy2FbZBheAZDZD';
 $pageId = '100589847991303';
 $pageName = "English NEWJ";
@@ -144,7 +144,7 @@ function postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData = array(),$t
 			}else{
 				$sql = "INSERT INTO ig_post_media_insights (".$insertQueryColumns.") VALUES (".$vls.") ";
 			}
-			echo $mediaData['ig_media_id'].'</n>';
+			echo $mediaData['ig_media_id']."\n";
 			$conn->query($sql);
 		} while ($pagesEdge = $fb->next($pagesEdge));
 }

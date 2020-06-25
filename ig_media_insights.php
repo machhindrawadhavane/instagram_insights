@@ -14,8 +14,8 @@ $fb = new \Facebook\Facebook([
     'default_graph_version' => 'v6.0',
     //'default_access_token' => '{access-token}', // optional
 ]);
-$isSaveUpdateMediaPostInsights = true;
-$isSaveUpdateMediaIds = false;
+$isSaveUpdateMediaPostInsights = false;
+$isSaveUpdateMediaIds = true;
 $app_token = 'EAAcqvrpUGOQBAMU1oZAGZAPbXIeBBuAFZAMHNUDeNYdjAiCnYvlUkAp7VJI5yy4h7VnlpleL0GXrObMCbURdVSd0FvHX0zNLpdZBYX4vwSOw4Emoh3ZCYyTMyTe2VYmGPKZBdZAjPbquB9YedBwqAkvi5lyF9euM82IHMy2FbZBheAZDZD';
 $pageId = '1954072204870360';
 $pageName = "NEWJ";
@@ -86,9 +86,9 @@ function postInstagramMediaMetaDataByMediaId($mediaData = array(),$token)
 			exit;
 		}
 		$pagesEdge = $resp->getGraphNode();
-		$updateQueryCoulumnValues = "caption='".$pagesEdge['caption']."',media_type='".$pagesEdge['media_type']."',permalink='".$pagesEdge['permalink']."',media_url='".$pagesEdge['media_url']."',shortcode='".$pagesEdge['shortcode']."',timestamp='".$pagesEdge['timestamp']."',like_count='".$pagesEdge['like_count']."',comments_count='".$pagesEdge['comments_count']."' ";
+		$updateQueryCoulumnValues = "caption='".$pagesEdge['caption']."',media_type='".$pagesEdge['media_type']."',permalink='".$pagesEdge['permalink']."',media_url='".isset($pagesEdge['media_url']) ? $pagesEdge['media_url'] : ""."',shortcode='".$pagesEdge['shortcode']."',timestamp='".$pagesEdge['timestamp']."',like_count='".$pagesEdge['like_count']."',comments_count='".$pagesEdge['comments_count']."' ";
 		$sql = "UPDATE ig_media_ids SET $updateQueryCoulumnValues WHERE ig_media_id = '".$mediaData['id']."' ";
-		echo $mediaData['id'].'</br>';
+		echo $mediaData['id']."\n";
 		$conn->query($sql);
 }
 
@@ -130,7 +130,7 @@ function postInstagramMediaInsightsDataLifeTimeByMediaId($mediaData = array(),$t
 			}else{
 				$sql = "INSERT INTO ig_post_media_insights (".$insertQueryColumns.") VALUES (".$vls.") ";
 			}
-			echo $mediaData['ig_media_id'].'<\n>';
+			echo $mediaData['ig_media_id']."\n";
 			$conn->query($sql);
 		} while ($pagesEdge = $fb->next($pagesEdge));
 }

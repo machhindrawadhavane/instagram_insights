@@ -38,11 +38,11 @@ function generateDates($start, $end)
 }
 
 $start = new DateTime('2020-04-14');
-$end = new DateTime('2020-04-27');
+$end = new DateTime('2020-06-25');
 
 $yearlyMonthData = generateDates($start, $end);
 $instagramBusinessAccountId = '17841407454307610';
-$query = "select * from ig_statuses where id = 2 ";
+$query = "select * from ig_statuses where id = 10 ";
 $result = mysqli_query($conn,$query);
 $pageInsightsStatusData = mysqli_fetch_object($result);
 $pageId = $pageInsightsStatusData->page_id;

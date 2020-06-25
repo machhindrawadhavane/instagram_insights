@@ -15,7 +15,7 @@ $fb = new \Facebook\Facebook([
     //'default_access_token' => '{access-token}', // optional
 ]);
 $isSaveUpdateMediaPostInsights = true;
-$isSaveUpdateMediaIds = false;
+$isSaveUpdateMediaIds = true;
 $app_token = 'EAAcqvrpUGOQBAMU1oZAGZAPbXIeBBuAFZAMHNUDeNYdjAiCnYvlUkAp7VJI5yy4h7VnlpleL0GXrObMCbURdVSd0FvHX0zNLpdZBYX4vwSOw4Emoh3ZCYyTMyTe2VYmGPKZBdZAjPbquB9YedBwqAkvi5lyF9euM82IHMy2FbZBheAZDZD';
 $pageId = '100589847991303';
 $pageName = "English NEWJ";

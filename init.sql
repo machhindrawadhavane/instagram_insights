@@ -1,0 +1,2 @@
+CREATE USER 'insta_cron'@'52.224.221.125' IDENTIFIED BY 'PassWord09';
+GRANT SELECT, INSERT, UPDATE ON fb.* TO 'insta_cron'@'52.224.221.125';

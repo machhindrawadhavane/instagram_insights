@@ -14,7 +14,7 @@ $fb = new \Facebook\Facebook([
     'default_graph_version' => 'v6.0',
     //'default_access_token' => '{access-token}', // optional
 ]);
-$isSaveUpdateMediaPostInsights = false;
+$isSaveUpdateMediaPostInsights = true;
 $isSaveUpdateMediaIds = true;
 $app_token = 'EAAcqvrpUGOQBAMU1oZAGZAPbXIeBBuAFZAMHNUDeNYdjAiCnYvlUkAp7VJI5yy4h7VnlpleL0GXrObMCbURdVSd0FvHX0zNLpdZBYX4vwSOw4Emoh3ZCYyTMyTe2VYmGPKZBdZAjPbquB9YedBwqAkvi5lyF9euM82IHMy2FbZBheAZDZD';
 $pageId = '1954072204870360';

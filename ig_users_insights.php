@@ -18,6 +18,7 @@ $fb = new \Facebook\Facebook([
 $app_token = 'EAAcqvrpUGOQBAMU1oZAGZAPbXIeBBuAFZAMHNUDeNYdjAiCnYvlUkAp7VJI5yy4h7VnlpleL0GXrObMCbURdVSd0FvHX0zNLpdZBYX4vwSOw4Emoh3ZCYyTMyTe2VYmGPKZBdZAjPbquB9YedBwqAkvi5lyF9euM82IHMy2FbZBheAZDZD';
 $pageId = '1954072204870360';
 $pageName = "NEWJ";
+$isUpdateIGStatuses = false;
 
 function generateDates($start, $end)
 {
@@ -37,12 +38,12 @@ function generateDates($start, $end)
   return $monthsArray;
 }
 
-$start = new DateTime('2020-04-14');
-$end = new DateTime('2020-06-25');
+$start = new DateTime('2020-07-01');
+$end = new DateTime('2020-07-31');
 
 $yearlyMonthData = generateDates($start, $end);
 $instagramBusinessAccountId = '17841407454307610';
-$query = "select * from ig_statuses where id = 10 ";
+$query = "select * from ig_statuses where id IN (1,2,10,12)";
 $result = mysqli_query($conn,$query);
 $pageInsightsStatusData = mysqli_fetch_object($result);
 $pageId = $pageInsightsStatusData->page_id;
@@ -51,7 +52,9 @@ $instagramBusinessAccountId = $pageInsightsStatusData->ig_business_account_id;
 $since = $pageInsightsStatusData->start_date;
 $until = $pageInsightsStatusData->end_date;
 
-$isUpdateIGStatuses = false;
+if($isUpdateIGStatuses == true){
+	updateInstagramStatusesData($app_token);
+}
 
 function checkTokenValidity($token)
 {
@@ -69,10 +72,6 @@ foreach($yearlyMonthData as $yearlyData){
 		postInstagramUserDaysInsightsDataByAccountID($app_token);
 		die;
 	}
-}
-
-if($isUpdateIGStatuses == true){
-	updateInstagramStatusesData($app_token);
 }
 
 function saveUpdateInstagramMediaIdFromBusinessAccountId($token)
@@ -152,7 +151,7 @@ function insertUpdateMediaInsighs($igMediaInsightsData=array()){
 		}else{
 			$sql = "INSERT INTO ig_users_post_insights_data_daywise (".$insertQueryColumns.") VALUES (".$vls.") ";
 		}
-		$updateStatusQuery = "UPDATE ig_statuses SET start_date='".$insightsDate."',end_date='".$insightsDate."' WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' ";
+		$updateStatusQuery = "UPDATE ig_statuses SET end_date='".$insightsDate."' WHERE ig_business_account_id = '".$fieldsData['ig_business_account_id']['value']."' ";
 		echo $updateStatusQuery."\n";
 		$conn->query($updateStatusQuery);
 		$conn->query($sql);
@@ -173,6 +172,7 @@ function updateInstagramStatusesData($token)
 			exit;
 		}
 		$pagesEdge = $resp->getGraphEdge();
+		print_r($pagesEdge);die;
 		do {
 			foreach($pagesEdge as $bAccounts){
 				$bAccounts->asArray();
